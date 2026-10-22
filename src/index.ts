@@ -109,12 +109,16 @@ export async function apply(ctx: any) {
   })
   disposers.push(offThemeChange)
 
-  // 3. Contribute settings card via ctx.ui
+  // 3. Contribute settings card via ctx.ui. The section is this plugin's
+  // own custom section ('catppuccin'), not a built-in one: both shells
+  // promote a custom section to a top-level settings entry — a left-nav
+  // tab on desktop, its own anchored section on mobile — so the card
+  // gets its own settings page instead of being embedded in General.
   ctx.inject(['ui'], (scoped: any) => {
     const unregisterSettings = scoped.ui.contribute({
       kind: 'settings',
       id: 'theme.catppuccin',
-      section: 'general',
+      section: 'catppuccin',
       title: 'Catppuccin Theme Suite',
       description: 'Soothing pastel theme collection for BBeBee with 4 official flavours and frosted glassmorphism.',
       icon: 'palette',

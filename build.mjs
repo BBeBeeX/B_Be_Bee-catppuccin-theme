@@ -23,6 +23,8 @@ function loadEsbuild() {
   const require = createRequire(import.meta.url)
   const candidates = [
     join(packageDir, 'node_modules'),
+    join(packageDir, '..', 'BBeBee', 'node_modules', '.pnpm', 'node_modules'),
+    join(packageDir, '..', 'BBeBee', 'node_modules'),
     join(packageDir, '..', 'B_Be_Bee', 'node_modules', '.pnpm', 'node_modules'),
     join(packageDir, '..', 'B_Be_Bee', 'node_modules'),
     join(packageDir, '..', 'node_modules'),
