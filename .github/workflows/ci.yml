@@ -1,0 +1,42 @@
+# Continuous verification for @bbebee/plugin-catppuccin-theme.
+#
+# Everything runs from the package's own declared devDependencies
+# (esbuild, typescript): the build must NOT depend on a sibling BBeBee
+# checkout — build.mjs prefers this package's node_modules, and the
+# sibling candidates in its lookup list are only a local-dev shortcut.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Build, test and pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Verify the package file set
+        run: npm pack --dry-run
