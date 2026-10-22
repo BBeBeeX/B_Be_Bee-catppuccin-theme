@@ -1,0 +1,30 @@
+{
+  "id": "bbebee-plugin-catppuccin-theme",
+  "name": "@bbebee/plugin-catppuccin-theme",
+  "displayName": "Catppuccin Theme Suite",
+  "description": "Official Catppuccin themes (Latte, Frappé, Macchiato, Mocha) + toggleable Glassmorphism (frosted acrylic glass) and interactive settings for BBeBee.",
+  "version": "1.0.0",
+  "author": "Catppuccin Org & BBeBee Community",
+  "engines": {
+    "BBeBee": "^0.1.0"
+  },
+  "enabled": true,
+  "dependencies": [
+    "@BBeBee/plugin-theme"
+  ],
+  "systemId": "layer-5",
+  "moduleId": "theme",
+  "entry": {
+    "main": "./dist/index.js",
+    "ui": {
+      "desktop": "./dist/ui-desktop.js"
+    }
+  },
+  "capabilities": [],
+  "contributes": {
+    "settings": [
+      "theme.catppuccin"
+    ]
+  },
+  "effect": "theme"
+}

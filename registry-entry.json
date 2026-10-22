@@ -1,0 +1,24 @@
+{
+  "id": "bbebee-plugin-catppuccin-theme",
+  "name": "Catppuccin Theme Suite",
+  "version": "1.0.0",
+  "author": "Catppuccin Org & BBeBee Community",
+  "description": "Official Catppuccin theme suite for BBeBee with Latte, Frappé, Macchiato, Mocha, and toggleable Glassmorphism.",
+  "category": "ui-enhancement",
+  "repo": "https://github.com/BBeBeeX/B_Be_Bee-catppuccin-theme",
+  "npm": "@bbebee/plugin-catppuccin-theme",
+  "dependencies": [],
+  "compositors": [],
+  "services": [
+    "theme",
+    "ui"
+  ],
+  "platforms": [
+    "desktop",
+    "mobile"
+  ],
+  "i18n": true,
+  "engines": {
+    "bbebee": ">=0.1.0"
+  }
+}

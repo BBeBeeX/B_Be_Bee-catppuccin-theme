@@ -1,0 +1,94 @@
+{
+  "id": "catppuccin-latte",
+  "name": "Catppuccin Latte",
+  "description": "Official Catppuccin Latte theme from the Catppuccin palette collection.",
+  "isDark": false,
+  "tokens": {
+    "bg": {
+      "app": "#dce0e8",
+      "primary": "#eff1f5",
+      "secondary": "#e6e9ef",
+      "tertiary": "#ccd0da"
+    },
+    "surface": {
+      "s1": "#e6e9ef",
+      "s2": "#ccd0da",
+      "s3": "#bcc0cc",
+      "hover": "#4c4f6910",
+      "active": "#4c4f691c",
+      "selected": "#1e66f522"
+    },
+    "brand": {
+      "primary": "#1e66f5",
+      "primaryActive": "#1453cc",
+      "primaryHover": "#3879f8",
+      "accent": "#8839ef",
+      "accentHover": "#7287fd"
+    },
+    "gradient": {
+      "brand": "linear-gradient(135deg, #1e66f5 0%, #7287fd 50%, #8839ef 100%)",
+      "progress": "linear-gradient(90deg, #1e66f5 0%, #7287fd 100%)",
+      "blueViolet": "linear-gradient(135deg, #1e66f5 0%, #8839ef 100%)",
+      "ice": "linear-gradient(135deg, #04a5e5 0%, #209fb5 50%, #1e66f5 100%)",
+      "spectrum": "linear-gradient(90deg, #d20f39 0%, #fe640b 20%, #df8e1d 40%, #40a02b 60%, #1e66f5 80%, #8839ef 100%)"
+    },
+    "text": {
+      "primary": "#4c4f69",
+      "secondary": "#5c5f77",
+      "tertiary": "#6c6f85",
+      "muted": "#7c7f93",
+      "disabled": "#9ca0b0",
+      "placeholder": "#9ca0b0"
+    },
+    "border": {
+      "subtle": "#4c4f691a",
+      "default": "#4c4f692e",
+      "hover": "#1e66f566",
+      "active": "#1e66f5",
+      "focus": "#1e66f588"
+    },
+    "semantic": {
+      "success": "#40a02b",
+      "warning": "#df8e1d",
+      "error": "#d20f39",
+      "info": "#1e66f5"
+    },
+    "music": {
+      "playing": "#40a02b",
+      "lyrics": "#5c5f77",
+      "lyricsActive": "#1e66f5",
+      "lyricsHighlight": "#4c4f69",
+      "waveform": "#4c4f6933",
+      "waveformActive": "#1e66f5"
+    },
+    "glow": {
+      "xs": "0 0 6px #1e66f520",
+      "sm": "0 0 12px #1e66f528",
+      "md": "0 0 20px #1e66f533",
+      "lg": "0 0 32px #1e66f53d"
+    }
+  },
+  "cssVariables": {
+    "--bb-radius-sm": "6px",
+    "--bb-radius-md": "10px",
+    "--bb-radius-pill": "999px",
+    "--catppuccin-rosewater": "#dc8a78",
+    "--catppuccin-flamingo": "#dd7878",
+    "--catppuccin-pink": "#ea76cb",
+    "--catppuccin-mauve": "#8839ef",
+    "--catppuccin-red": "#d20f39",
+    "--catppuccin-maroon": "#e64553",
+    "--catppuccin-peach": "#fe640b",
+    "--catppuccin-yellow": "#df8e1d",
+    "--catppuccin-green": "#40a02b",
+    "--catppuccin-teal": "#179299",
+    "--catppuccin-sky": "#04a5e5",
+    "--catppuccin-sapphire": "#209fb5",
+    "--catppuccin-blue": "#1e66f5",
+    "--catppuccin-lavender": "#7287fd",
+    "--catppuccin-text": "#4c4f69",
+    "--catppuccin-base": "#eff1f5",
+    "--catppuccin-mantle": "#e6e9ef",
+    "--catppuccin-crust": "#dce0e8"
+  }
+}
