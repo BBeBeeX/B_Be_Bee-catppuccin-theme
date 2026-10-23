@@ -50,9 +50,9 @@
 ## 🚀 安装与使用方法
 
 ### 方式 1：直接导入单体主题包（零依赖，最简单）
-在 `themes/` 目录下已预先生成了 5 个标准格式的主题包文件：
+在 `themes/` 目录下已预先生成了标准格式的主题文件：
+- `catppuccin-pack.json`（主题包：四种风味合一，导入后在「通用」中切换风味；玻璃质感是包内预设，不再是独立文件）
 - `catppuccin-mocha.json`
-- `catppuccin-mocha-glass.json`（预置磨砂玻璃拟态版）
 - `catppuccin-macchiato.json`
 - `catppuccin-frappe.json`
 - `catppuccin-latte.json`

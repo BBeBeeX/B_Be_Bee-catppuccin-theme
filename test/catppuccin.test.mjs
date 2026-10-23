@@ -6,7 +6,7 @@ import {
   buildBBeBeeTokens,
   generateThemeJson,
 } from '../src/palettes.ts'
-import { getGlassCssVariables } from '../src/glass.ts'
+import { buildCatppuccinPack, CATPPUCCIN_PACK_ID } from '../src/pack.ts'
 
 // Relative luminance formula per WCAG 2.1
 function hexToLuminance(hex) {
@@ -68,13 +68,25 @@ test('generateThemeJson outputs valid BBeBee theme structure', () => {
   assert.equal(latteJson.isDark, false)
 })
 
-test('getGlassCssVariables produces glassmorphism variables when enabled', () => {
-  const vars = getGlassCssVariables('mocha', { enabled: true, blurPx: 24, opacity: 0.8 })
-  assert.equal(vars['--bb-glass-enabled'], '1')
-  assert.equal(vars['--bb-glass-blur'], '24px')
-  assert.ok(vars['--bg-app'].startsWith('rgba('))
-  assert.ok(vars['--bevel-chamfer-top'])
+test('buildCatppuccinPack bundles all 4 flavours as variants of one pack', () => {
+  const pack = buildCatppuccinPack({ accent: 'mauve', glassEnabled: false, glassBlur: 20, glassOpacity: 0.78 })
+  assert.equal(pack.id, CATPPUCCIN_PACK_ID)
+  assert.equal(pack.origin, 'plugin')
+  assert.equal(pack.variants.length, 4)
+  assert.deepEqual(
+    pack.variants.map((v) => v.id).sort(),
+    ['catppuccin-frappe', 'catppuccin-latte', 'catppuccin-macchiato', 'catppuccin-mocha'],
+  )
+  assert.equal(pack.preview.colors.length, 3)
+  for (const variant of pack.variants) {
+    assert.equal(variant.effects, undefined, 'no glass preset when glass is disabled')
+  }
+})
 
-  const disabledVars = getGlassCssVariables('mocha', { enabled: false })
-  assert.equal(disabledVars['--bb-glass-enabled'], '0')
+test('glass travels as a pack preset (effects.glass), not a variant or DOM hack', () => {
+  const pack = buildCatppuccinPack({ accent: 'blue', glassEnabled: true, glassBlur: 24, glassOpacity: 0.8 })
+  for (const variant of pack.variants) {
+    assert.deepEqual(variant.effects, { glass: { blurPx: 24, saturate: 180, opacity: 80 } })
+  }
+  assert.ok(!pack.variants.some((v) => v.id.includes('glass')), 'no glass pseudo-variant')
 })

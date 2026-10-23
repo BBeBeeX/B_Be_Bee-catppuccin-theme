@@ -1,13 +1,19 @@
 /**
  * Catppuccin Theme Suite — Headless Cordis Plugin.
  *
- * Registers the 4 official Catppuccin flavours (Latte, Frappé, Macchiato, Mocha)
- * into `ctx.theme`, registers the Glassmorphism engine, and contributes the
- * interactive settings card into BBeBee settings.
+ * Registers the 4 official Catppuccin flavours (Latte, Frappé, Macchiato,
+ * Mocha) as ONE ThemePack into `ctx.theme` (the host settings page lists
+ * the pack under 通用 and switches flavours as pack variants), and
+ * contributes the accent/glass-preset settings card. On hosts without
+ * the pack API it falls back to per-flavour `registerTheme` calls.
+ *
+ * Glass is a pack-level preset, not a theme and not DOM injection: the
+ * variants carry `effects.glass` values that the host renders; the
+ * user's own glass settings always override the preset.
  */
 
-import { CATPPUCCIN_FLAVORS, generateThemeJson, type CatppuccinAccent, type CatppuccinFlavorId } from './palettes.ts'
-import { applyGlassmorphismToDom, getGlassCssVariables } from './glass.ts'
+import type { CatppuccinAccent, CatppuccinFlavorId } from './palettes.ts'
+import { buildCatppuccinPack } from './pack.ts'
 
 export interface CatppuccinPrefs {
   flavor: CatppuccinFlavorId
@@ -56,60 +62,36 @@ export async function apply(ctx: any) {
   ctx.logger?.info?.('plugin-catppuccin-theme: initializing')
 
   const disposers: Array<() => void> = []
+  let packDisposer: (() => void) | undefined
   const themeDisposers = new Map<string, () => void>()
 
   let currentPrefs = loadStoredPrefs()
 
-  // Function to register or update Catppuccin themes in ctx.theme
+  // Register or update the Catppuccin pack with the current prefs. When a
+  // Catppuccin variant is active, the host re-applies it on pack
+  // re-registration, so accent/glass changes repaint live.
   function registerThemesWithPrefs(prefs: CatppuccinPrefs) {
+    const pack = buildCatppuccinPack(prefs)
+    if (typeof ctx.theme?.registerThemePack === 'function') {
+      packDisposer?.()
+      packDisposer = ctx.theme.registerThemePack(pack)
+      return
+    }
+    // Fallback for hosts predating the ThemePack API: one registration
+    // per flavour, as before.
     if (!ctx.theme?.registerTheme) return
-
-    for (const meta of Object.values(CATPPUCCIN_FLAVORS)) {
-      const themeDef = generateThemeJson(meta.id, prefs.glassEnabled, prefs.accent)
-
-      // If glassmorphism is active and matches current theme, attach glass variables
-      if (prefs.glassEnabled) {
-        const glassVars = getGlassCssVariables(meta.flavor, {
-          enabled: true,
-          blurPx: prefs.glassBlur,
-          opacity: prefs.glassOpacity,
-        })
-        themeDef.cssVariables = {
-          ...(themeDef.cssVariables || {}),
-          ...glassVars,
-        }
-      }
-
-      // Re-register theme
-      const existingDisposer = themeDisposers.get(meta.id)
-      if (existingDisposer) {
-        existingDisposer()
-      }
-      const disposer = ctx.theme.registerTheme(themeDef)
-      themeDisposers.set(meta.id, disposer)
+    for (const variant of pack.variants) {
+      const themeDef = { ...variant }
+      delete (themeDef as Record<string, unknown>).effects
+      themeDisposers.get(themeDef.id as string)?.()
+      themeDisposers.set(themeDef.id as string, ctx.theme.registerTheme(themeDef))
     }
   }
 
-  // 1. Initial registration of the 4 flavours
+  // 1. Initial registration
   registerThemesWithPrefs(currentPrefs)
 
-  // 2. React to theme change events to apply glass style tag if Catppuccin is active
-  const offThemeChange = ctx.on('theme/changed', (theme: any) => {
-    if (theme?.id?.startsWith('catppuccin-')) {
-      const flavorKey = theme.id.replace('catppuccin-', '') as CatppuccinFlavorId
-      applyGlassmorphismToDom(flavorKey, {
-        enabled: currentPrefs.glassEnabled,
-        blurPx: currentPrefs.glassBlur,
-        opacity: currentPrefs.glassOpacity,
-      })
-    } else {
-      // Non-catppuccin theme active, remove glass style tag
-      applyGlassmorphismToDom('mocha', { enabled: false })
-    }
-  })
-  disposers.push(offThemeChange)
-
-  // 3. Contribute settings card via ctx.ui. The section is this plugin's
+  // 2. Contribute settings card via ctx.ui. The section is this plugin's
   // own custom section ('catppuccin'), not a built-in one: both shells
   // promote a custom section to a top-level settings entry — a left-nav
   // tab on desktop, its own anchored section on mobile — so the card
@@ -120,7 +102,7 @@ export async function apply(ctx: any) {
       id: 'theme.catppuccin',
       section: 'catppuccin',
       title: 'Catppuccin Theme Suite',
-      description: 'Soothing pastel theme collection for BBeBee with 4 official flavours and frosted glassmorphism.',
+      description: 'Soothing pastel theme collection for BBeBee with 4 official flavours and a host-rendered glass preset.',
       icon: 'palette',
       display: 'card',
       order: 25,
@@ -128,32 +110,21 @@ export async function apply(ctx: any) {
     disposers.push(unregisterSettings)
   })
 
-  // 4. Listen for preferences update broadcast
+  // 3. Listen for preferences update broadcast: re-registering the pack
+  // is the whole update path (the host repaints the active variant).
   const offPrefsUpdate = ctx.on('catppuccin/update-prefs', (newPrefs: Partial<CatppuccinPrefs>) => {
     currentPrefs = { ...currentPrefs, ...newPrefs }
     saveStoredPrefs(currentPrefs)
     registerThemesWithPrefs(currentPrefs)
-
-    const activeTheme = ctx.theme?.getCurrentTheme?.()
-    if (activeTheme?.id?.startsWith('catppuccin-')) {
-      const flavorKey = activeTheme.id.replace('catppuccin-', '') as CatppuccinFlavorId
-      applyGlassmorphismToDom(flavorKey, {
-        enabled: currentPrefs.glassEnabled,
-        blurPx: currentPrefs.glassBlur,
-        opacity: currentPrefs.glassOpacity,
-      })
-      // Trigger theme re-application to pick up new cssVariables
-      void ctx.theme?.setTheme?.(activeTheme.id)
-    }
   })
   disposers.push(offPrefsUpdate)
 
-  ctx.logger?.info?.('plugin-catppuccin-theme: ready (Mocha, Macchiato, Frappé, Latte registered)')
+  ctx.logger?.info?.('plugin-catppuccin-theme: ready (pack "catppuccin" with Mocha, Macchiato, Frappé, Latte variants)')
 
   return () => {
+    packDisposer?.()
     for (const d of themeDisposers.values()) d()
     for (const d of disposers) d()
-    applyGlassmorphismToDom('mocha', { enabled: false })
     ctx.logger?.info?.('plugin-catppuccin-theme: disposed')
   }
 }

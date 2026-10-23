@@ -15,7 +15,7 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'no
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { CATPPUCCIN_FLAVORS, generateThemeJson } from './src/palettes.ts'
-import { getGlassCssVariables } from './src/glass.ts'
+import { buildCatppuccinPack } from './src/pack.ts'
 
 const packageDir = dirname(fileURLToPath(import.meta.url))
 
@@ -100,23 +100,14 @@ mkdirSync(themesDir, { recursive: true })
 for (const flavor of Object.values(CATPPUCCIN_FLAVORS)) {
   const jsonContent = generateThemeJson(flavor.id, false)
   writeFileSync(join(themesDir, `${flavor.id}.json`), JSON.stringify(jsonContent, null, 2), 'utf8')
-
-  // Mocha with pre-baked Glassmorphism
-  if (flavor.id === 'catppuccin-mocha') {
-    const glassJson = {
-      ...jsonContent,
-      id: 'catppuccin-mocha-glass',
-      name: 'Catppuccin Mocha (Glassmorphism)',
-      description: 'Catppuccin Mocha theme with frosted glassmorphism enabled by default.',
-      cssVariables: {
-        ...(jsonContent.cssVariables || {}),
-        ...getGlassCssVariables('mocha', { enabled: true, blurPx: 20, opacity: 0.78 }),
-      },
-    }
-    writeFileSync(join(themesDir, 'catppuccin-mocha-glass.json'), JSON.stringify(glassJson, null, 2), 'utf8')
-  }
 }
-console.log('themes/*.json generated successfully.')
+
+// The pack document: all four flavours in one file — the distribution
+// shape the registry and the host's pack import consume. Glass is a
+// preset field inside it, never a separate pseudo-variant file.
+const pack = buildCatppuccinPack({ accent: 'mauve', glassEnabled: false, glassBlur: 20, glassOpacity: 0.78 })
+writeFileSync(join(themesDir, 'catppuccin-pack.json'), JSON.stringify(pack, null, 2), 'utf8')
+console.log('themes/*.json + themes/catppuccin-pack.json generated successfully.')
 
 // 2. Bundle with esbuild
 const esbuild = loadEsbuild()

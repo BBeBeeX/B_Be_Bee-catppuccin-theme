@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  CATPPUCCIN_FLAVORS,
-  CATPPUCCIN_RAW_PALETTES,
-  type CatppuccinAccent,
-  type CatppuccinFlavorId,
-} from './palettes.ts'
+import { type CatppuccinAccent } from './palettes.ts'
 import { loadStoredPrefs, type CatppuccinPrefs } from './index.ts'
 
 const ACCENT_LIST: Array<{ key: CatppuccinAccent; name: string; hex: string }> = [
@@ -30,16 +25,6 @@ export function CatppuccinSettingsCard({ ctx }: { ctx: any }) {
     const off = ctx?.on?.('theme/changed', update)
     return () => off?.()
   }, [ctx])
-
-  const handleSelectFlavor = (flavor: CatppuccinFlavorId) => {
-    const themeId = `catppuccin-${flavor}`
-    setPrefs((prev) => {
-      const next = { ...prev, flavor }
-      ctx?.emit?.('catppuccin/update-prefs', next)
-      return next
-    })
-    void ctx?.theme?.setTheme?.(themeId)
-  }
 
   const handleSelectAccent = (accent: CatppuccinAccent) => {
     setPrefs((prev) => {
@@ -108,63 +93,16 @@ export function CatppuccinSettingsCard({ ctx }: { ctx: any }) {
         </span>
       </div>
 
-      {/* 1. Flavor Switcher Grid */}
+      {/* Flavours are pack variants now: switching lives in the host's
+          theme settings (通用 category); this card keeps accent + glass. */}
       <div style={{ marginBottom: 20 }}>
-        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>
-          主题风味选择（Flavor）
+        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>
+          主题风味（Flavor）
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-          {Object.values(CATPPUCCIN_FLAVORS).map((item) => {
-            const isSelected = currentThemeId === item.id
-            const p = CATPPUCCIN_RAW_PALETTES[item.flavor]
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleSelectFlavor(item.flavor)}
-                style={{
-                  background: p.base,
-                  border: isSelected ? `2px solid ${p.mauve || p.blue}` : `1px solid ${p.surface1}`,
-                  borderRadius: 12,
-                  padding: '12px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.18s ease',
-                  position: 'relative',
-                  boxShadow: isSelected ? '0 4px 16px rgba(0, 0, 0, 0.35)' : 'none',
-                  transform: isSelected ? 'scale(1.02)' : 'none',
-                }}
-              >
-                {/* Color swatches preview */}
-                <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: p.mauve }} />
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: p.blue }} />
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: p.green }} />
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: p.peach }} />
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: p.text }}>
-                  {item.emoji} {item.name.replace('Catppuccin ', '')}
-                </div>
-                <div style={{ fontSize: 11, color: p.subtext0, marginTop: 2 }}>
-                  {item.isDark ? '暗色模式 (Dark)' : '亮色模式 (Light)'}
-                </div>
-                {isSelected && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      fontSize: 12,
-                      color: p.mauve || p.blue,
-                      fontWeight: 800,
-                    }}
-                  >
-                    ✓
-                  </div>
-                )}
-              </button>
-            )
-          })}
-        </div>
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary, #8E8E93)', lineHeight: 1.5 }}>
+          Latte / Frappé / Macchiato / Mocha 已合并为一个主题包，请在「设置 → 通用 → 主题」中切换风味。
+          当前主题：{currentThemeId}
+        </p>
       </div>
 
       {/* 2. Accent Color Picker */}
@@ -225,7 +163,7 @@ export function CatppuccinSettingsCard({ ctx }: { ctx: any }) {
               💎 磨砂玻璃质感（Glassmorphism）
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-              为导航顶栏、侧边栏底板与底栏播放器启用透明磨砂与高光倒角
+              作为主题包的玻璃预设提供给宿主渲染；你在「通用 → 玻璃质感」中的设置优先于此预设
             </div>
           </div>
           <button
